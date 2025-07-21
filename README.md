@@ -29,5 +29,10 @@ Este projeto implementa um chatbot para automação de mensagens + analise e con
     npm i
 
 3. Na raíz do projeto, execute: 
+ - Buildar toda aplicação: 
+    ```bash
+    npm run build
+    
+ - Executar o Servidor
     ```bash
     npm run start
