@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "rootDir": "./backend",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["backend"], // ← Isso limita o build apenas à pasta backend
+  "exclude": ["frontend", "node_modules"] // ← Isso garante não utilizar esses locais para o build do server
+}
