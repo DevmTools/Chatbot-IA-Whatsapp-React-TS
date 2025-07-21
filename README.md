@@ -20,6 +20,14 @@ Este projeto implementa um chatbot para automação de mensagens + analise e con
    ```bash
    git clone https://github.com/seu-usuario/chatbot-whatsapp.git
 2. Instale as dependencias:
-    - raiz do Projeto execute: npm i
-    - Raiz pasta frontend execute : npm i
-3. Na raíz do projeto, execute: npm run start
+ - raiz do Projeto execute: 
+    ```bash 
+    npm i
+    
+ - Raiz pasta frontend execute: 
+    ```bash
+    npm i
+
+3. Na raíz do projeto, execute: 
+    ```bash
+    npm run start
