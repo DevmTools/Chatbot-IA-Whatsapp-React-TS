@@ -38,3 +38,7 @@ Este projeto implementa um chatbot para automação de mensagens + analise e con
  - Executar o Servidor
     ```bash
     npm run start
+
+ - Empacotar com pkg
+    ```bash
+    pkg . --targets node18-win-x64
