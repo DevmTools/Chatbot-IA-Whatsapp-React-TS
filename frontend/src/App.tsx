@@ -1,11 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  
+  useEffect(()=>{
+    const socket = new WebSocket("ws://localhost:3000");
+    
+    socket.onmessage = (event) =>{
+      console.log(`Socket => ${event}`)
+    }
 
+    socket.onerror = (error) => {
+      console.error(`Socket error => ${error}`)
+    }
+  },[])
   return (
     <>
       <div>

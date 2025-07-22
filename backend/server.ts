@@ -1,10 +1,10 @@
-import { exec } from "child_process";
 import express from "express";
-import { readFile } from "fs";
 import http from "http";
 import path from "path";
 import readline from "readline";
 import { WebSocket, WebSocketServer } from "ws";
+
+import { exec } from "child_process";
 
 const app = express();
 const server = http.createServer(app);
@@ -20,7 +20,6 @@ let browserPathGlobalPath: string | null = null;
 
 
 
-/* CONECT WS / FRONTEND START */
 /**
  * Function ask Browser
 */
@@ -57,15 +56,24 @@ wss.on("connection", (ws) => {
     browserPathGlobalPath = await askBrowserPathClient();
     const url = `http://localhost:${PORT}`;
 
-    server.listen(PORT, () =>{
-        console.log(`Servidor Rodando em ${url}. Nagegador encontrado e executando.`);
+    server.listen(PORT, () => {
+        console.log(`Servidor Rodando em ${url}.`);
     });
 
-    if(process.platform === 'win32'){
-        exec(`start "${url}"`)
+    /*if(!browserPathGlobalPath){
+      console.warn("Navegador informado não identificado.\nNavegador padrao do sistema acionado.")
+      openBrowser(url);
     }else{
-        exec(`xdg-open "${url}"`)
+      console.log("Navegador encontrado e executado.")
+      await openBrowser(url, { app: { name: browserPathGlobalPath} });
+    }*/
+
+    if (browserPathGlobalPath) {
+      exec(`start "" "${browserPathGlobalPath}" ${url}`);
+    } else {
+      exec(`start "" ${url}`); // Usa o navegador padrão
     }
+
 })();
 
 /**
@@ -75,4 +83,3 @@ app.use(express.static(path.resolve(__dirname, "../frontend/dist")));
 app.get("*", (_, res) => {
     res.sendFile(path.join(__dirname, "../frontend/dist/index.html"))
 });
-/* CONNECT WS / FRONTEND END */

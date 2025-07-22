@@ -9,6 +9,12 @@
     "build": "npm run build:frontend && npm run build:backend",
     "start": "node dist/server.js"
   },
+  "bin": "dist/server.js",
+  "pkg": {
+    "assets": [
+      "frontend/dist/**/*"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
