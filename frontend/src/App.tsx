@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from 'react'
+
 
 function App() {
-  const [count, setCount] = useState(0)
   
+
+
   useEffect(()=>{
     const socket = new WebSocket("ws://localhost:3000");
     
@@ -16,29 +15,56 @@ function App() {
     socket.onerror = (error) => {
       console.error(`Socket error => ${error}`)
     }
+
   },[])
+  
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      {/* Painel Ações Bot */}
+      <div id="area_actions_app">
+        <div id="btn_start">Iniciar Bot</div>
+        <div id="btn_disconnect">Desconectar</div>
+        <div id="btn_delete_sesion">Excluir Sessão</div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+      {/* Conteúdo dividido */}
+      <div id="content_wrapper">
+        {/* Área QRCode */}
+        <div id="area_qrcode">
+          <h3>Escaneie o QR Code</h3>
+          {/* Aqui vai o QRCode futuramente */}
+        </div>
+
+        {/* Tabela de usuários */}
+        <div id="area_users_chat">
+          <h3>Usuários Conectados</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Id</th>
+                <th>Time Ultima Mensagem</th>
+                <th>Bot Ativado/Desativado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Lista dinâmica futura */}
+              <tr>
+                <td>Nome</td>
+                <td>99999999999@z_zz</td>
+                <td>99/99/99 99:99</td>
+                <td><button className="toggle-btn enabled">Habilitado</button></td>
+              </tr>
+              <tr>
+                <td>Nome</td>
+                <td>99999999999@z_zz</td>
+                <td>99/99/99 99:99</td>
+                <td><button className="toggle-btn disabled">Desabilitado</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }

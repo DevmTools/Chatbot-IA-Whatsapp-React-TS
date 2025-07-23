@@ -1,0 +1,99 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Layout geral */
+body {
+    background-color: #444;
+    padding: 20px;
+}
+
+
+/*--------------------*/
+
+
+/* Area dos botões */
+#area_actions_app {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+#area_actions_app>div {
+    padding: 10px 20px;
+    background-color: #e78f31;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    text-align: center;
+}
+
+#area_actions_app>div:hover {
+    background-color: #b16a1e;
+}
+
+/* Grid de conteúdo abaixo dos botões */
+#content_wrapper {
+    display: flex;
+    gap: 20px;
+}
+
+/* Área do QRCode */
+#area_qrcode {
+    flex: 1;
+    min-height: 300px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* Área da Tabela de Usuários */
+#area_users_chat {
+    flex: 2;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f5f5f5;
+}
+
+.toggle-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.toggle-btn.enabled {
+    background-color: #28a745;
+}
+
+.toggle-btn.disabled {
+    background-color: #dc3545;
+}

@@ -3,7 +3,6 @@ import http from "http";
 import path from "path";
 import readline from "readline";
 import { WebSocket, WebSocketServer } from "ws";
-
 import { exec } from "child_process";
 
 const app = express();
@@ -14,6 +13,7 @@ const PORT = 3000;
 let wsClient : WebSocket | null = null;
 let browserPathGlobalPath: string | null = null;
 
+let countSocketSession = 0;
 
 
 
@@ -44,12 +44,15 @@ function askBrowserPathClient(): Promise<string> {
  * Server local Websocket
 */
 wss.on("connection", (ws) => {
-    console.log("🌐 WebSocket Conectado!");    
+
+    console.log("🌐 WebSocket Conectado! => " + countSocketSession);    
     wsClient = ws;
 
     ws.on("close", () => {
-        console.log("❌ WebSocket Desconectado!");
+        
+        console.log("❌ WebSocket Desconectado! => " + countSocketSession);
         wsClient = null;
+        countSocketSession++
     });
 });
 (async () => {
@@ -60,17 +63,13 @@ wss.on("connection", (ws) => {
         console.log(`Servidor Rodando em ${url}.`);
     });
 
-    /*if(!browserPathGlobalPath){
-      console.warn("Navegador informado não identificado.\nNavegador padrao do sistema acionado.")
-      openBrowser(url);
-    }else{
+    if (browserPathGlobalPath) 
+    {
       console.log("Navegador encontrado e executado.")
-      await openBrowser(url, { app: { name: browserPathGlobalPath} });
-    }*/
-
-    if (browserPathGlobalPath) {
       exec(`start "" "${browserPathGlobalPath}" ${url}`);
-    } else {
+    } else 
+    {
+      console.warn("Navegador informado não identificado.\nNavegador padrao do sistema acionado.")
       exec(`start "" ${url}`); // Usa o navegador padrão
     }
 
