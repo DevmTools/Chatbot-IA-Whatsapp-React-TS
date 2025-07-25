@@ -1,3 +1,12 @@
+/*Root*/
+:root {
+    --color-base: #ff914d;
+    --color-base-hover: #dc7d42;
+    --color-button-green: #28a745;
+    --color-button-yellow: #ffde59;
+    --color-button-red: #dc3545;
+}
+
 /* Reset básico */
 * {
     margin: 0;
@@ -26,7 +35,7 @@ body {
 
 #area_actions_app>div {
     padding: 10px 20px;
-    background-color: #e78f31;
+    background-color: var(--color-base);
     color: white;
     border-radius: 5px;
     cursor: pointer;
@@ -36,7 +45,12 @@ body {
 }
 
 #area_actions_app>div:hover {
-    background-color: #b16a1e;
+    background-color: var(--color-base-hover);
+}
+
+#btn_start.disabled {
+    cursor: none;
+    background-color: var(--color-base-hover);
 }
 
 /* Grid de conteúdo abaixo dos botões */
@@ -53,6 +67,8 @@ body {
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 20px;
+    justify-content: center;
+    text-align: center;
 }
 
 /* Área da Tabela de Usuários */
@@ -91,9 +107,12 @@ th {
 }
 
 .toggle-btn.enabled {
-    background-color: #28a745;
+    background-color: var(--color-button-green);
 }
 
 .toggle-btn.disabled {
-    background-color: #dc3545;
+    background-color: var(--color-button-red);
 }
+
+
+/*********************************PRESETS*******************************************/

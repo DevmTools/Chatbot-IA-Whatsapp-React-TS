@@ -6,7 +6,7 @@
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
-    
+    //"skipLibCheck": true        // ← Isso ignora erros nas libs do node_modules
   },
   "include": ["backend"], // ← Isso limita o build apenas à pasta backend
   "exclude": ["frontend", "node_modules"] // ← Isso garante não utilizar esses locais para o build do server

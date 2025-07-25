@@ -1,38 +1,68 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react';
+import loading from "./assets/img/loading_gif.gif";
 
-
-function App() {
+export default function App() {
   
+  const [qrCode, setQrCode] = useState <string | null> (null);
+  const [isLoadingConnect, setIsLoadingConnect] = useState<boolean>(false);
+  const [isClientReady, setIsClientReady] = useState<boolean>(false)
 
-
-  useEffect(()=>{
-    const socket = new WebSocket("ws://localhost:3000");
+  const handleActionConnection = async (url: string) => {
+    setIsLoadingConnect(true);
     
-    socket.onmessage = (event) =>{
-      console.log(`Socket => ${event}`)
-    }
+    const res = await fetch(url);
+    const data = await res.json();
 
+    if (data.qr) {
+      setIsLoadingConnect(false);
+      setQrCode(data.qr);
+    } else {
+      setQrCode(null); 
+    }
+  }
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3000");
+    socket.onmessage = (event) => {
+      const wsComunication:{type:string, message:string} = JSON.parse(event.data.toString());
+      console.log(wsComunication.message);
+      if(wsComunication.type === "scanqr-true" || wsComunication.type === "instance-true"){
+        setQrCode(null);
+        setIsLoadingConnect(false);
+        setIsClientReady(true);
+      }
+    }
     socket.onerror = (error) => {
       console.error(`Socket error => ${error}`)
     }
-
   },[])
   
   return (
     <>
-      {/* Painel Ações Bot */}
+      {/* Actions */}
       <div id="area_actions_app">
-        <div id="btn_start">Iniciar Bot</div>
+        <div id="btn_start" 
+          className={isClientReady ? "disabled" : ""}
+          onClick={isClientReady ? () => {} : () => handleActionConnection("/getQRCode")}
+        >
+          {isClientReady ? "Pronto ✅" : "Conectar"}
+        </div>
         <div id="btn_disconnect">Desconectar</div>
         <div id="btn_delete_sesion">Excluir Sessão</div>
       </div>
 
-      {/* Conteúdo dividido */}
+      {/* Panel */}
       <div id="content_wrapper">
         {/* Área QRCode */}
         <div id="area_qrcode">
-          <h3>Escaneie o QR Code</h3>
-          {/* Aqui vai o QRCode futuramente */}
+          <h3>{ qrCode ? "Escanear QRCode:" : !qrCode && isLoadingConnect ? "Gerando QRCode..." : qrCode && !isLoadingConnect ? "Aguarde, autenticando com a Meta..." : !qrCode && !isLoadingConnect && isClientReady ? "Conectado e Pronto!" : "Não Conectado!" }</h3>
+          {
+            qrCode || isLoadingConnect 
+            ?
+              <img id="qrImage" src={qrCode && !isLoadingConnect ? qrCode : loading} alt="QR Code" className="mx-auto" />
+            :
+              <></>
+          }
         </div>
 
         {/* Tabela de usuários */}
@@ -68,5 +98,3 @@ function App() {
     </>
   )
 }
-
-export default App
