@@ -5,6 +5,8 @@ import { WebSocket, WebSocketServer } from "ws";
 import { exec } from "child_process";
 import qrcode from "qrcode";
 import { askBrowserPathClient } from "./utils/askBrowserPathClient"
+import fs from "fs"
+
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
 const app = express();
@@ -26,7 +28,6 @@ let qrUrl: string | null = null
 //❌ Falha
 
 app.get("/getQRCode", async (_, res) => {
-
   // 1 verifica instancia existente
   if(wwebInstance){
     qrUrl = null;
@@ -84,6 +85,68 @@ app.get("/getQRCode", async (_, res) => {
   }catch (error:any) 
   {
     res.json({qr:null, message: `[💻] - QRCode gerado. Aguardando autenticação ${error.message}`})
+  }
+})
+
+app.get("/disconnect", async (_, res ) => {
+  try 
+  {
+    if(!wwebInstance)
+    {
+      wsocketInstance?.send(JSON.stringify({type:"disconnect-false", message:"[🌐] > Não existe Conexao Pronta! ❌"}));
+      return res.json({message:"[💻] - Não existe Conexão Pronta! ❌"});
+    }
+    await wwebInstance.destroy();
+    wwebInstance = null;
+    qrUrl = null;
+    
+    wsocketInstance?.send(JSON.stringify({type:"disconnect-true", message:"[🌐] > Sessão desconectada com Sucesso! ✅"}));
+    return res.json({message:"[💻] - Sessão desconectada! ✅"});
+  } catch (error) {
+    return res.status(500).json({ message: "[💻] - Erro ao excluir sessão. ❌"});
+  }
+
+
+})
+
+app.get("/delete-session", async (_, res) => {
+  try 
+  {
+    const authPath = path.join(process.cwd(), ".wwebjs_auth");
+    const cachePath = path.join(process.cwd(), ".wwebjs_cache");
+    
+    if(!wwebInstance)
+    {
+      if(fs.existsSync(authPath))
+      {
+        fs.rmSync(authPath,{recursive:true, force: true});
+      }
+      if(fs.existsSync(cachePath))
+      {
+        fs.rmSync(cachePath,{recursive:true, force: true});
+      }
+      wsocketInstance?.send(JSON.stringify({type:"delete-true", message:"[🌐] > Histórico de Autenticação e Cache apagados com sucesso! ✅"}));
+      return res.status(200).json({message:"[💻] - Histórico de Autenticação e Cache apagados com sucesso! ✅"})
+    } 
+
+    await wwebInstance.destroy();
+    
+    wwebInstance = null;
+    qrUrl = null
+
+    if(fs.existsSync(authPath))
+    {
+      fs.rmSync(authPath,{recursive:true, force: true});
+    }
+    if(fs.existsSync(cachePath))
+    {
+      fs.rmSync(cachePath,{recursive:true, force: true});
+    }
+    wsocketInstance?.send(JSON.stringify({type:"delete-true", message:"[🌐] > Sessão desconectada e Excluido com Sucesso! ✅"}));
+    return res.status(200).json({message:"[💻] - Sessão desconectada e Excluido com Sucesso! ✅"})
+  } catch (error) 
+  {
+    return res.status(500).json({ message: "[💻] - Erro ao excluir sessão. ❌"});
   }
 })
 

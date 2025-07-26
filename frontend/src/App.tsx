@@ -2,23 +2,41 @@ import { useEffect, useState } from 'react';
 import loading from "./assets/img/loading_gif.gif";
 
 export default function App() {
-  
+  //C:\Program Files\Google\Chrome\Application\chrome.exe
   const [qrCode, setQrCode] = useState <string | null> (null);
   const [isLoadingConnect, setIsLoadingConnect] = useState<boolean>(false);
-  const [isClientReady, setIsClientReady] = useState<boolean>(false)
+  const [isLoadingDisconnect, setIsLoadingDisconnect] = useState<boolean>(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
+  const [isClientReady, setIsClientReady] = useState<boolean>(false);
 
-  const handleActionConnection = async (url: string) => {
-    setIsLoadingConnect(true);
-    
+  const fetchGlobal = async(url:string) => {
     const res = await fetch(url);
     const data = await res.json();
+    return data;
+  }
 
+  const handleConnection = async (url: string) => {
+    setIsLoadingConnect(true);
+    const data = await fetchGlobal(url);
     if (data.qr) {
       setIsLoadingConnect(false);
       setQrCode(data.qr);
     } else {
       setQrCode(null); 
     }
+     //fetchChats();
+  }
+
+  const handleDisconnect = async (url: string) => {
+    setIsLoadingDisconnect(true)
+    await fetchGlobal(url);
+    //fetchChats();
+  }
+
+  const handleDelete = async (url: string) => {
+    setIsLoadingDelete(true);
+    await fetchGlobal(url);
+    //fetchChats();
   }
 
   useEffect(() => {
@@ -26,10 +44,26 @@ export default function App() {
     socket.onmessage = (event) => {
       const wsComunication:{type:string, message:string} = JSON.parse(event.data.toString());
       console.log(wsComunication.message);
-      if(wsComunication.type === "scanqr-true" || wsComunication.type === "instance-true"){
+      if(wsComunication.type === "scanqr-true" || wsComunication.type === "instance-true")
+        {
         setQrCode(null);
         setIsLoadingConnect(false);
         setIsClientReady(true);
+        return
+      }
+      if(wsComunication.type === "disconnect-true" || wsComunication.type === "delete-true")
+        {
+        setIsClientReady(false);
+        setQrCode(null);
+        if(wsComunication.type === "disconnect-true")
+        {
+          setIsLoadingDisconnect(false);
+        }
+        if(wsComunication.type === "delete-true")
+          {
+          setIsLoadingDelete(false);
+        }
+        return
       }
     }
     socket.onerror = (error) => {
@@ -41,14 +75,29 @@ export default function App() {
     <>
       {/* Actions */}
       <div id="area_actions_app">
+        {/*Connect*/}
         <div id="btn_start" 
-          className={isClientReady ? "disabled" : ""}
-          onClick={isClientReady ? () => {} : () => handleActionConnection("/getQRCode")}
+          className={isClientReady || (qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete) ? "disabled" : ""}
+          onClick={isClientReady || (qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete) ? (() => {}) : (() => handleConnection("/getQRCode"))}
         >
-          {isClientReady ? "Pronto ✅" : "Conectar"}
+          {!isClientReady && (qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete) ? (<>Conectando... <img id="qrImage" src={loading} alt="Carregando" className="mx-auto" /> </>) : isClientReady ? "Pronto ✅" : "Conectar"}
         </div>
-        <div id="btn_disconnect">Desconectar</div>
-        <div id="btn_delete_sesion">Excluir Sessão</div>
+
+        {/*Disconnect*/}
+        <div id="btn_disconnect" 
+          className={!isClientReady || (qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete) ? "disabled" : ""}
+          onClick={!isClientReady || (qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete) ? (() => {}) : (() => handleDisconnect("/disconnect"))}
+        >
+          {isLoadingDisconnect ? "Desconectando Sessão..." : "Desconectar"}
+        </div>
+
+        {/*Delete */}
+        <div id="btn_delete_sesion"
+          className={qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete ? "disabled" : ""}
+          onClick={qrCode || isLoadingConnect || isLoadingDisconnect || isLoadingDelete ? ()=>{} : () => handleDelete("/delete-session")}
+        >
+          {isLoadingDelete ? "Exluindo Sessão..." : "Excluir Sessão"}
+        </div>
       </div>
 
       {/* Panel */}

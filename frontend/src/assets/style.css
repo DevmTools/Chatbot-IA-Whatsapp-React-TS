@@ -5,6 +5,8 @@
     --color-button-green: #28a745;
     --color-button-yellow: #ffde59;
     --color-button-red: #dc3545;
+    --color-button-disabled: #ba2d3b;
+    --color-text-disabled: #c7c7c7;
 }
 
 /* Reset básico */
@@ -48,9 +50,16 @@ body {
     background-color: var(--color-base-hover);
 }
 
-#btn_start.disabled {
+#area_actions_app>div.disabled {
     cursor: none;
-    background-color: var(--color-base-hover);
+    color: var(--color-text-disabled);
+    background-color: var(--color-button-disabled);
+
+}
+
+#area_actions_app>div>img {
+    width: 16px;
+
 }
 
 /* Grid de conteúdo abaixo dos botões */
