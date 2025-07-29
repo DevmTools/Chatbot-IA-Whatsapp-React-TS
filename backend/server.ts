@@ -16,9 +16,10 @@ const PORT = 3000;
 
 let isClientReady = false;
 let wsocketInstance : WebSocket | null = null;
-let wwebInstance: any = null;
+let wwebInstance: typeof Client | null = null;
 let browserPath = null;
 let qrUrl: string | null = null
+let ignorarBotsPara: Set<string> = new Set();
 
 //✨ IA
 //🤖 Robo
@@ -67,7 +68,7 @@ app.get("/getQRCode", async (_, res) => {
       }
     });
 
-    wwebInstance.on("authenticated", () => {
+    wwebInstance!.on("authenticated", () => {
       wsocketInstance?.send(JSON.stringify({type:"scanqr-true", message:"[🌐] > QR Code escaneado com sucesso! ✅"}));
       qrUrl = null;
     });
@@ -105,8 +106,6 @@ app.get("/disconnect", async (_, res ) => {
   } catch (error) {
     return res.status(500).json({ message: "[💻] - Erro ao excluir sessão. ❌"});
   }
-
-
 })
 
 app.get("/delete-session", async (_, res) => {
@@ -149,6 +148,43 @@ app.get("/delete-session", async (_, res) => {
     return res.status(500).json({ message: "[💻] - Erro ao excluir sessão. ❌"});
   }
 })
+
+app.get("/chats", async (_, res) => {
+  
+  if(!wwebInstance || !isClientReady)
+  {
+    wsocketInstance?.send(JSON.stringify({type:"chats-false", message:"[🌐] > Não existe Conexao Pronta para buscar Chats! ❌"}));
+    return res.status(400).json({ message: "[💻] - Não existe Conexao Pronta para buscar Chats! ❌"})
+  }  
+
+  const chats = await wwebInstance?.getChats();
+
+  const listChats = chats.map((chat:any) =>(
+    {
+      id: chat.id._serialized,
+      name:(chat.name || chat.id.user),
+      isGroup:chat.isGroup,
+      bot_ignorado: ignorarBotsPara.has(chat.id._serialized)
+    }
+  ));
+  wsocketInstance?.send(JSON.stringify({type:"chats-true", message:"[🌐] > Lista com Chats contruida com sucesso! ✅"}));
+  res.json(listChats);
+})
+
+app.get("/allow/:id", async (req, res) => {
+  const id = req.params.id;
+  ignorarBotsPara.delete(id);
+  wsocketInstance?.send(JSON.stringify({type:"botenable-true", message:"[🌐] > Bot habilitado para ${id} ✅"}));
+  return res.status(200).json({message: `json({ message: "[💻] - Bot habilitado para ${id} ✅"})`})
+});
+
+app.get("/ignore/:id", async (req, res) => {
+  const id = req.params.id;
+  ignorarBotsPara.add(id);
+  wsocketInstance?.send(JSON.stringify({type:"botignore-true", message:"[🌐] > Bot desabilitado para ${id} ❌"}));
+  return res.status(200).json({message: `json({ message: "[💻] - Bot desabilitado para ${id} ❌"})`})
+});
+
 
 
 

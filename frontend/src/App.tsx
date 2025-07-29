@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import loading from "./assets/img/loading_gif.gif";
 
+type Chat = {
+  id: string;
+  name: string;
+  isGroup: boolean;
+  bot_ignorado: boolean;
+}
+
 export default function App() {
   //C:\Program Files\Google\Chrome\Application\chrome.exe
   const [qrCode, setQrCode] = useState <string | null> (null);
@@ -8,6 +15,8 @@ export default function App() {
   const [isLoadingDisconnect, setIsLoadingDisconnect] = useState<boolean>(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [isClientReady, setIsClientReady] = useState<boolean>(false);
+  const [chats, setChats] = useState<Chat[]>([]);
+
 
   const fetchGlobal = async(url:string) => {
     const res = await fetch(url);
@@ -19,24 +28,35 @@ export default function App() {
     setIsLoadingConnect(true);
     const data = await fetchGlobal(url);
     if (data.qr) {
-      setIsLoadingConnect(false);
       setQrCode(data.qr);
+      setIsLoadingConnect(false);
     } else {
       setQrCode(null); 
     }
-     //fetchChats();
   }
 
   const handleDisconnect = async (url: string) => {
     setIsLoadingDisconnect(true)
     await fetchGlobal(url);
-    //fetchChats();
   }
 
   const handleDelete = async (url: string) => {
     setIsLoadingDelete(true);
     await fetchGlobal(url);
-    //fetchChats();
+  }
+
+  const fetchChats = async () => {
+    const chats = await fetchGlobal("/chats");
+    if(Array.isArray(chats))
+    {
+      setChats(chats);
+      return
+    }
+    setChats([]);
+  }
+
+  const handleActionUserBot = async (id:string, type:"allow"|"ignore") =>{
+    await fetch(`/${ type }/${ id }`);
   }
 
   useEffect(() => {
@@ -63,12 +83,22 @@ export default function App() {
           {
           setIsLoadingDelete(false);
         }
+        fetchChats();
         return
+      }
+      if(wsComunication.type === "wweb-true")
+      {
+        fetchChats();
+      }
+      if(wsComunication.type === "botenable-true" || wsComunication.type === "botignore-true" ){
+        fetchChats();
       }
     }
     socket.onerror = (error) => {
       console.error(`Socket error => ${error}`)
     }
+
+    return () => socket.close();
   },[])
   
   return (
@@ -118,6 +148,7 @@ export default function App() {
         <div id="area_users_chat">
           <h3>Usuários Conectados</h3>
           <table>
+            
             <thead>
               <tr>
                 <th>Nome</th>
@@ -126,22 +157,31 @@ export default function App() {
                 <th>Bot Ativado/Desativado</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody >
               {/* Lista dinâmica futura */}
-              <tr>
-                <td>Nome</td>
-                <td>99999999999@z_zz</td>
-                <td>99/99/99 99:99</td>
-                <td><button className="toggle-btn enabled">Habilitado</button></td>
-              </tr>
-              <tr>
-                <td>Nome</td>
-                <td>99999999999@z_zz</td>
-                <td>99/99/99 99:99</td>
-                <td><button className="toggle-btn disabled">Desabilitado</button></td>
-              </tr>
+              {
+                chats && chats.map((chat, index) => (
+                  <>
+                    <tr key={index}>
+                      <td>{chat.name}</td>
+                      <td>{chat.id}</td>
+                      <td>99/99/99 99:99</td>
+                      <td>
+                        <button 
+                          className={chat.bot_ignorado ? "toggle-btn disabled" : "toggle-btn enabled"}
+                          onClick={() => handleActionUserBot(chat.id, (chat.bot_ignorado ? "allow" : "ignore"))}
+                        >
+                          {chat.bot_ignorado ? "Desabilitado" : "Habilitado"}
+                        </button>
+                      </td>
+                    </tr>
+                  </>
+                  )
+                )
+              }
             </tbody>
           </table>
+           {isLoadingConnect && <img style={{width:"20%", margin:"auto", display:"block"}} id="qrImage" src={loading} alt="Carregando" className="mx-auto" />}
         </div>
       </div>
     </>

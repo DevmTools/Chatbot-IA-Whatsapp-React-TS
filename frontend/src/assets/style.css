@@ -23,9 +23,7 @@ body {
     padding: 20px;
 }
 
-
 /*--------------------*/
-
 
 /* Area dos botões */
 #area_actions_app {
@@ -54,12 +52,10 @@ body {
     cursor: none;
     color: var(--color-text-disabled);
     background-color: var(--color-button-disabled);
-
 }
 
 #area_actions_app>div>img {
     width: 16px;
-
 }
 
 /* Grid de conteúdo abaixo dos botões */
