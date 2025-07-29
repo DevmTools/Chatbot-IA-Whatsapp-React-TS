@@ -64,12 +64,11 @@ export default function App() {
     socket.onmessage = (event) => {
       const wsComunication:{type:string, message:string} = JSON.parse(event.data.toString());
       console.log(wsComunication.message);
-      if(wsComunication.type === "scanqr-true" || wsComunication.type === "instance-true")
+      if(wsComunication.type === "scanqr-true")
         {
         setQrCode(null);
         setIsLoadingConnect(false);
         setIsClientReady(true);
-        fetchChats();
         return
       }
       if(wsComunication.type === "disconnect-true" || wsComunication.type === "delete-true")
@@ -87,8 +86,10 @@ export default function App() {
         fetchChats()
         return
       }
-      if(wsComunication.type === "wweb-true")
+      if(wsComunication.type === "wweb-true" || wsComunication.type === "instance-true")
       {
+        setIsLoadingConnect(false);
+        setIsClientReady(true);
         fetchChats();
       }
       if(wsComunication.type === "botenable-true" || wsComunication.type === "botignore-true" ){

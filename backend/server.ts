@@ -100,6 +100,7 @@ app.get("/disconnect", async (_, res ) => {
     await wwebInstance.destroy();
     wwebInstance = null;
     qrUrl = null;
+    isClientReady = false;
     
     wsocketInstance?.send(JSON.stringify({type:"disconnect-true", message:"[🌐] > Sessão desconectada com Sucesso! ✅"}));
     return res.json({message:"[💻] - Sessão desconectada! ✅"});
@@ -132,6 +133,7 @@ app.get("/delete-session", async (_, res) => {
     
     wwebInstance = null;
     qrUrl = null
+    isClientReady = false;
 
     if(fs.existsSync(authPath))
     {
@@ -154,7 +156,7 @@ app.get("/chats", async (_, res) => {
   if(!wwebInstance || !isClientReady)
   {
     wsocketInstance?.send(JSON.stringify({type:"chats-false", message:"[🌐] > Não existe Conexao Pronta para buscar Chats! ❌"}));
-    return res.status(400).json({ message: "[💻] - Não existe Conexao Pronta para buscar Chats! ❌"})
+    return res.json({ message: "[💻] - Não existe Conexao Pronta para buscar Chats! ❌"})
   }  
 
   const chats = await wwebInstance?.getChats();
