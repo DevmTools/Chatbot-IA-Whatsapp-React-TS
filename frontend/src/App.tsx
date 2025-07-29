@@ -69,6 +69,7 @@ export default function App() {
         setQrCode(null);
         setIsLoadingConnect(false);
         setIsClientReady(true);
+        fetchChats();
         return
       }
       if(wsComunication.type === "disconnect-true" || wsComunication.type === "delete-true")
@@ -83,7 +84,7 @@ export default function App() {
           {
           setIsLoadingDelete(false);
         }
-        fetchChats();
+        fetchChats()
         return
       }
       if(wsComunication.type === "wweb-true")
