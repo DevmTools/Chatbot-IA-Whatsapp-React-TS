@@ -130,6 +130,11 @@ export default function App() {
         >
           {isLoadingDelete ? "Exluindo Sessão..." : "Excluir Sessão"}
         </div>
+        <div id=""
+          className={""}
+        >
+          <a target='_blank' href='https://devm.com.br/printbot-gerador-atendimento-whatsapp'>Criar Novo Atendimento</a>
+        </div>
       </div>
 
       {/* Panel */}
@@ -186,6 +191,18 @@ export default function App() {
            {isLoadingConnect && <img style={{width:"20%", margin:"auto", display:"block"}} id="qrImage" src={loading} alt="Carregando" className="mx-auto" />}
         </div>
       </div>
+
+       {/*<div style={{ width: '100%', height: '500px' }}>
+      <iframe
+        src="https://devm.com.br/printbot-gerador-atendimento-whatsapp"
+        title="Site Externo"
+        width="100%"
+        height="100%"
+        style={{ border: 'none' }}
+        allow="fullscreen"
+        loading="lazy"
+      ></iframe>
+    </div>*/}
     </>
   )
 }

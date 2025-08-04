@@ -6,6 +6,7 @@ import { exec } from "child_process";
 import qrcode from "qrcode";
 import { askBrowserPathClient } from "./utils/askBrowserPathClient"
 import fs from "fs"
+import { text } from "stream/consumers";
 
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
@@ -21,6 +22,19 @@ let browserPath = null;
 let qrUrl: string | null = null
 let ignorarBotsPara: Set<string> = new Set();
 
+type SubResposta = {
+  gatilho: string;
+  resposta: string;
+  subrespostas?: SubResposta[];
+};
+type AutomacaoItem = {
+  gatilho: string;
+  resposta: string;
+  subrespostas?: SubResposta[];
+};
+let configuracoesBot: AutomacaoItem[] = [];
+const contextoUsuario = new Map<string, SubResposta[]>();
+
 //✨ IA
 //🤖 Robo
 //🌐 WebSocket
@@ -28,6 +42,7 @@ let ignorarBotsPara: Set<string> = new Set();
 //✅ Sucesso
 //❌ Falha
 
+/***********************Endpoints/Ouvintes****************************** */
 app.get("/getQRCode", async (_, res) => {
   // 1 verifica instancia existente
   if(wwebInstance){
@@ -52,6 +67,72 @@ app.get("/getQRCode", async (_, res) => {
   wwebInstance.on("ready", () => {
     wsocketInstance?.send(JSON.stringify({type:"wweb-true", message:"[🌐] > Instancia Whatsapp Ready!"}));
     isClientReady = true;
+
+    wwebInstance!.on("message", (msg:any) => 
+    {
+      const numero = msg.from;
+      const texto = msg.body.trim();
+      const contextoAtual = contextoUsuario.get(numero);
+
+      //Números Bloueados
+      if (ignorarBotsPara.has(numero)) {
+        wsocketInstance?.send(JSON.stringify({message:"[🌐] > 🙈 Robo Ignorando conversa com ${user}!"}));
+        console.log(`🙈 Robo Ignorando conversa com ${numero}!`);
+        return;
+      }
+
+      //Gatilho Bot
+      function responderGatilhoInicial(texto: string, msg: any) 
+      {
+        msgReply(msg, `${texto === '0' 
+          ? 'Você retornou ao Menu Inicial' 
+          : "Ola tudo bem?\nVocê esta em um atendimento automatizado.\nDigite e envie o numero opção desejada."}`);
+        const menu = configuracoesBot.map((item, index) => `[ *${index + 1}* ] - ${item.gatilho}`).join("\n");
+        contextoUsuario.set(msg.from, configuracoesBot);
+        msgSend(msg.from, msgMenu(menu, "MENU INICIAL"));
+      }
+     
+      //Comando para voltar ao início
+      if (texto === "0") {
+        contextoUsuario.delete(numero);
+        return responderGatilhoInicial(texto, msg);
+      }
+      
+      //Verifica se tem contexto salvo
+      if (contextoAtual && Array.isArray(contextoAtual)) {
+        const index = Number(texto) - 1;
+
+        if (!isNaN(index) && contextoAtual[index]) {
+          const sub = contextoAtual[index];
+          
+          if (sub.subrespostas) {
+            if(sub.subrespostas.length > 0){
+              msgReply(msg, `${sub.resposta}`);
+            }
+            contextoUsuario.set(numero, sub.subrespostas);
+            // Mostra menu com subrespostas
+            const menu = sub.subrespostas.map((opcao, idx) => `[ *${idx + 1}* ] - ${opcao.gatilho}`).join("\n");
+            //menu ou resposta, caso nao tenha opções para o nivel especifico
+            msgSend(numero, msgMenu(
+              sub.subrespostas.length > 0 
+                ? menu 
+                : sub.resposta, 
+              sub.subrespostas.length > 0 ? "ESCOLHA UMA OPÇÃO" : `VOLTE AO MENU`));
+          } else {
+            contextoUsuario.delete(numero);
+          }
+          return;
+        } else {
+          const menu = contextoAtual.map((item, idx) => `[ *${idx + 1}* ] - ${item.gatilho}`).join("\n");
+          msgSend(numero, msgMenu(menu, 'OPÇÕES DISPONÍVEIS', "❌ OPÇÃO INVÁLIDA", texto));
+          return;
+        }
+      }
+
+      // Procurando resposta no nível inicial
+      responderGatilhoInicial(texto, msg);
+      
+    });
   });
 
   // Criando qrCode com url do Whatsapp
@@ -183,19 +264,37 @@ app.get("/allow/:id", async (req, res) => {
 app.get("/ignore/:id", async (req, res) => {
   const id = req.params.id;
   ignorarBotsPara.add(id);
-  wsocketInstance?.send(JSON.stringify({type:"botignore-true", message:"[🌐] > Bot desabilitado para ${id} ❌"}));
+  wsocketInstance?.send(JSON.stringify({type:"botignore-true", message:`[🌐] > Bot desabilitado para ${id} ❌`}));
   return res.status(200).json({message: `json({ message: "[💻] - Bot desabilitado para ${id} ❌"})`})
 });
+/***********************Endpoints/Ouvintes****************************** */
 
 
+/***********************BOT/Configuração****************************** */
+try {
+  const configPath = path.join(process.cwd(), "botconfig.json");
+  if (fs.existsSync(configPath)) 
+  {
+    const raw = fs.readFileSync(configPath, "utf-8");
+    const parsed = JSON.parse(raw);
+    if (parsed?.respostas && Array.isArray(parsed.respostas)) 
+    {
+      configuracoesBot = parsed.respostas;
+      console.log("[🤖] - Configuração de atendimento carregada com sucesso.✅");
+    }else
+    {
+      console.log("[🤖] - Estrutura de atendimento do JSON inválida. ❌");
+    }
+  } else 
+  {
+    console.log("[🤖] - Arquivo de atendimento botconfig.json não encontrado. ❌");
+  }
+} catch (err) {
+  console.error("[🤖] - Erro ao ler Devm-automacao.json: ❌ ", err);
+}
+/***********************BOT/Configuração****************************** */
 
-
-
-
-
-
-
-
+/***********************Conexao/Socket****************************** */
 /*
  * Define server local Websocket
 */
@@ -209,7 +308,6 @@ wss.on("connection", (ws) => {
       wsocketInstance = null;
     });
 });
-
 /*
  * Run Server in Browser
 */
@@ -231,7 +329,6 @@ wss.on("connection", (ws) => {
       exec(`start "" "${url}"`); // Usa o navegador padrão
     }
 })();
-
 /**
  * Define local to frontend
  */
@@ -239,3 +336,24 @@ app.use(express.static(path.resolve(__dirname, "../frontend/dist")));
 app.get("*", (_, res) => {
     res.sendFile(path.join(__dirname, "../frontend/dist/index.html"))
 });
+/***********************Conexao/Socket****************************** */
+
+/***********************Funções Utilitarias************************** */
+function msgSend(number: string, text: string) {
+  wwebInstance?.sendMessage(number, text);
+}
+
+function msgReply(msg:any,text:string){
+  msg.reply(text);
+}
+
+const msgMenu = (menu:string, title?:string, titleSecond?:string, text?:string):string => {
+  return`
+📋 ${titleSecond && text ? `[ *${text}* ] - *${titleSecond}*` : `*${title}*`}
+\n${menu}\n
+════════════════════════
+💬 Digite o número da opção   
+↩️ Digite *0* para menu inicial
+  `
+}
+/***********************Funções Utilitarias************************** */

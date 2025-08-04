@@ -19,11 +19,12 @@
 
 /* Layout geral */
 body {
-    background-color: #444;
+    background-color: #121212;
     padding: 20px;
 }
 
 /*--------------------*/
+
 
 /* Area dos botões */
 #area_actions_app {
@@ -56,6 +57,12 @@ body {
 
 #area_actions_app>div>img {
     width: 16px;
+}
+
+#area_actions_app>div>a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 /* Grid de conteúdo abaixo dos botões */
