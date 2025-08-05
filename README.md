@@ -85,7 +85,7 @@ O arquivo `chatbot-whatsapp.exe` será gerado e pode ser executado diretamente e
 
 ## 💬 Configurações do Bot
 
-Edite o arquivo `botconfig.json` para personalizar as respostas, gatilhos e estrutura do seu atendimento automatizado.
+Edite o arquivo `botconfig.json` para personalizar as respostas, gatilhos e estrutura do seu atendimento automatizado. O Arquivo `botconfig.json` deve estar na raiz do projeto ou no mesmo nivel do .exe quando empadotado.
 
 ---
 
@@ -94,9 +94,9 @@ Edite o arquivo `botconfig.json` para personalizar as respostas, gatilhos e estr
 Se este projeto te ajudou, considere apoiar com uma doação espontânea 💖
 
 ### Faça um PIX com qualquer valor
-📲 **Chave Pix**: [livepix.gg/curtosecortes](https://livepix.gg/curtosecortes)
+📲 **Chave Pix**: [livepix.gg/curtosecortes](https://livepix.gg/devmm)
 
-[![Doação Espontanea](https://widget.livepix.gg/embed/0a637a6d-beaf-4476-b332-3bcdad850ff6)](https://widget.livepix.gg)
+[![Doação Espontanea](https://github.com/DevmTools/Chatbot-IA-Whatsapp-React-TS/blob/develop/docs/qrcode-donation.png)](https://github.com)
 
 
 ---
