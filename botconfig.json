@@ -1,6 +1,27 @@
 {
-  "cliente": "Mercado L&M",
+  "cliente": "Mercado",
   "respostas": [
+    {
+      "gatilho": "Endereço ",
+      "resposta": "🏠 Endereço: Avenida Brasil, 123 - São Paulo, SP \n📍 Nossa loja: Clique nolink para ver no mapa](https://goo.gl/maps/XyZ123ABCxyz)",
+      "subrespostas": []
+    },
+    {
+      "gatilho": "Promoções",
+      "resposta": "Promoções do dia e produtos com vencimento próximo.",
+      "subrespostas": [
+        {
+          "gatilho": "Vencimento Próximo",
+          "resposta": "📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
+          "subrespostas": []
+        },
+        {
+          "gatilho": "Promoções",
+          "resposta": "📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
+          "subrespostas": []
+        }
+      ]
+    },
     {
       "gatilho": "Produtos",
       "resposta": "Produtos em geral, escolha uma opção para ver.",
@@ -14,6 +35,11 @@
               "resposta": "Cervejas, Vinhos e Destilados.",
               "subrespostas": [
                 {
+                  "gatilho": "Destilados",
+                  "resposta": "📦 Nome: Vodka\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Velho Barreiro\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
+                  "subrespostas": []
+                },
+                {
                   "gatilho": "Cervejas",
                   "resposta": "📦 Nome: Cerveja Skol\n📄 Descrição: 750ml, suave, ideal para jantares\n💲 Preço: R$ 39,90\n\n📦 Nome: Cerveja Bhrama\n📄 Descrição: 750ml, suave, ideal para jantares\n💲 Preço: R$ 39,90\n\n📦 Nome: Cerveja Antartica\n📄 Descrição: 750ml, suave, ideal para jantares\n💲 Preço: R$ 39,90",
                   "subrespostas": []
@@ -21,11 +47,6 @@
                 {
                   "gatilho": "Vinhos",
                   "resposta": "📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Português \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
-                  "subrespostas": []
-                },
-                {
-                  "gatilho": "Destilados",
-                  "resposta": "📦 Nome: Vodka\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Velho Barreiro\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
                   "subrespostas": []
                 }
               ]
@@ -49,27 +70,6 @@
           ]
         }
       ]
-    },
-    {
-      "gatilho": "Promoções",
-      "resposta": "Promoções do dia e produtos com vencimento próximo.",
-      "subrespostas": [
-        {
-          "gatilho": "Promoções",
-          "resposta": "📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
-          "subrespostas": []
-        },
-        {
-          "gatilho": "Vencimento Próximo",
-          "resposta": "📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90\n\n📦 Nome: Vinho Chileno \n📅 Vencimento: 99/99/9999\n📄 Descrição: 750ml, suave, ideal para jantares \n💲 Preço: R$ 39,90",
-          "subrespostas": []
-        }
-      ]
-    },
-    {
-      "gatilho": "Endereço ",
-      "resposta": "🏠 Endereço: Avenida Brasil, 123 - São Paulo, SP \n📍 Nossa loja: Clique nolink para ver no mapa](https://goo.gl/maps/XyZ123ABCxyz)",
-      "subrespostas": []
     }
   ]
 }

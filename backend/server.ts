@@ -6,7 +6,6 @@ import { exec } from "child_process";
 import qrcode from "qrcode";
 import { askBrowserPathClient } from "./utils/askBrowserPathClient"
 import fs from "fs"
-import { text } from "stream/consumers";
 
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
@@ -117,9 +116,9 @@ app.get("/getQRCode", async (_, res) => {
           const sub = contextoAtual[index];
           
           if (sub.subrespostas) {
-            if(sub.subrespostas.length > 0){
+            /*if(sub.subrespostas.length > 0){
               msgReply(msg, `${sub.resposta}`);
-            }
+            }*/
             contextoUsuario.set(numero, sub.subrespostas);
             // Mostra menu com subrespostas
             const menu = sub.subrespostas.map((opcao, idx) => `[ *${idx + 1}* ] - ${opcao.gatilho}`).join("\n");
