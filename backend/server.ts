@@ -64,9 +64,14 @@ app.get("/getQRCode", async (_, res) => {
   wwebInstance.initialize();
 
   // 4 Instancia pronta
-  wwebInstance.on("ready", () => {
+  wwebInstance.on("ready", async () => {
     wsocketInstance?.send(JSON.stringify({type:"wweb-true", message:"[🌐] > Instancia Whatsapp Ready!"}));
     isClientReady = true;
+
+       const chats = await wwebInstance!.getChats();
+        chats.forEach((chat: any) => {
+          ignorarBotsPara.add(chat.id._serialized);
+        });
 
     wwebInstance!.on("message", (msg:any) => 
     {
@@ -74,9 +79,15 @@ app.get("/getQRCode", async (_, res) => {
       const texto = msg.body.trim();
       const contextoAtual = contextoUsuario.get(numero);
 
+      // 🛑 Ignora mensagens de grupos
+      if (numero.endsWith("@g.us")) {
+        wsocketInstance?.send(JSON.stringify({message:`[🌐] > 🙈 Robo Ignorando Grupo com ${numero}!`}));
+        console.log(`🙈 Robo Ignorando conversa com ${numero}!`);
+        return;
+      }
       //Números Bloueados
       if (ignorarBotsPara.has(numero)) {
-        wsocketInstance?.send(JSON.stringify({message:"[🌐] > 🙈 Robo Ignorando conversa com ${user}!"}));
+        wsocketInstance?.send(JSON.stringify({message:`[🌐] > 🙈 Robo Ignorando conversa com ${numero}!`}));
         console.log(`🙈 Robo Ignorando conversa com ${numero}!`);
         return;
       }
@@ -242,7 +253,7 @@ app.get("/chats", async (_, res) => {
 
   const chats = await wwebInstance?.getChats();
 
-  const listChats = chats.map((chat:any) =>(
+  const listChats = chats.map((chat:any) => (
     {
       id: chat.id._serialized,
       name:(chat.name || chat.id.user),
@@ -250,6 +261,7 @@ app.get("/chats", async (_, res) => {
       bot_ignorado: ignorarBotsPara.has(chat.id._serialized)
     }
   ));
+
   wsocketInstance?.send(JSON.stringify({type:"chats-true", message:"[🌐] > Lista com Chats contruida com sucesso! ✅"}));
   res.json(listChats);
 })
@@ -257,7 +269,7 @@ app.get("/chats", async (_, res) => {
 app.get("/allow/:id", async (req, res) => {
   const id = req.params.id;
   ignorarBotsPara.delete(id);
-  wsocketInstance?.send(JSON.stringify({type:"botenable-true", message:"[🌐] > Bot habilitado para ${id} ✅"}));
+  wsocketInstance?.send(JSON.stringify({type:"botenable-true", message:`[🌐] > Bot habilitado para ${id} ✅`}));
   return res.status(200).json({message: `json({ message: "[💻] - Bot habilitado para ${id} ✅"})`})
 });
 
