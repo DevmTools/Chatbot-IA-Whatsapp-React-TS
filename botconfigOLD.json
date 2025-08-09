@@ -70,47 +70,6 @@
           ]
         }
       ]
-    },
-    {
-      "gatilho": "Financiamento XPTO",
-      "resposta": "Simulação de Imóvel",
-      "subrespostas": [
-        {
-          "gatilho": "financiamento|auto",
-          "resposta": "Olá! Vamos iniciar sua simulação. Qual o seu nome?",
-          "subrespostas": [
-            {
-              "gatilho": "[nome]",
-              "resposta": "Qual seu Nome?",
-              "subrespostas": [
-                {
-                  "gatilho": "[cidade]",
-                  "resposta": "Qual a sua Cidade?",
-                  "subrespostas": [
-                    {
-                      "gatilho": "[tem_fgts]",
-                      "resposta": "Você tem FGTS para usar?",
-                      "subrespostas": [
-                        {
-                          "gatilho": "[vai_usar_fgts]",
-                          "resposta": "Você pretende usar FGTS",
-                          "subrespostas": [
-                            {
-                              "gatilho": "[email]",
-                              "resposta": "digite seu email para encaminharmos o pdf com as instruções!",
-                              "subrespostas": []
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
     }
   ]
 }

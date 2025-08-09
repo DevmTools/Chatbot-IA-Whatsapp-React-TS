@@ -96,7 +96,7 @@ Se este projeto te ajudou, considere apoiar com uma doação espontânea 💖
 ### Faça um PIX com qualquer valor
 📲 **Chave Pix**: [livepix.gg/curtosecortes](https://livepix.gg/devmm)
 
-[![Doação Espontanea](https://github.com/DevmTools/Chatbot-IA-Whatsapp-React-TS/blob/develop/docs/qrcode-donation.png)](https://github.com)
+[![Doação Espontanea](https://github.com/DevmTools/Chatbot-IA-Whatsapp-React-TS/blob/develop/docs/qrcode-donation.png)](https://livepix.gg/devmm)
 
 
 ---

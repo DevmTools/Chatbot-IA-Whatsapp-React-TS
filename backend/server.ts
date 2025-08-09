@@ -34,6 +34,146 @@ type AutomacaoItem = {
 let configuracoesBot: AutomacaoItem[] = [];
 const contextoUsuario = new Map<string, SubResposta[]>();
 
+
+/* VERSÃO PARA SIMULAÇÃO DE IMÓVEIS */
+type AtendimentoAuto = {
+  etapaAtual: any;
+  historico: { chave: string; valor: string }[];
+};
+
+const atendimentosAuto = new Map<string, AtendimentoAuto>();
+
+const configPath = path.join(process.cwd(), "botconfig.json");
+const botConfig = fs.existsSync(configPath)
+  ? JSON.parse(fs.readFileSync(configPath, "utf-8"))
+  : { respostas: [] };
+
+  async function handleAutoFlow(msg: any): Promise<boolean> {
+  const numero = msg.from;
+  const textoRaw = msg.body.trim();
+  const texto = textoRaw.toLowerCase();
+
+  // === iniciar ===
+  if (!atendimentosAuto.has(numero)) {
+    const respostaRaiz = botConfig.respostas.find((r: any) => {
+      if (!r.gatilho || typeof r.gatilho !== "string") return false;
+      const [gatilho, tipo] = r.gatilho.toLowerCase().split("|");
+      return tipo === "auto" && texto === gatilho;
+    });
+
+    if (respostaRaiz) {
+      atendimentosAuto.set(numero, {
+        etapaAtual: respostaRaiz,
+        historico: []
+      });
+      await msg.reply(respostaRaiz.resposta);
+      return true; // consumido
+    }
+  }
+
+  // === continuar ===
+  if (atendimentosAuto.has(numero)) {
+    const atendimento = atendimentosAuto.get(numero)!;
+    const etapaAtual = atendimento.etapaAtual;
+    const subrespostas = etapaAtual.subrespostas || [];
+
+    let proximaEtapa: any = null;
+
+    const textoRaw = msg.body.trim();
+    const texto = textoRaw.toLowerCase();
+
+    // 1. Se o próprio nó atual é campo livre ([nome], [cidade], etc.), consome ele primeiro
+    if (
+      typeof etapaAtual.gatilho === "string" &&
+      etapaAtual.gatilho.startsWith("[") &&
+      etapaAtual.gatilho.endsWith("]")
+    ) {
+      const campo = etapaAtual.gatilho.replace(/\[|\]/g, "");
+      atendimento.historico.push({ chave: campo, valor: textoRaw });
+
+      // desce para o próximo dentro das subrespostas dele
+      if (etapaAtual.subrespostas && etapaAtual.subrespostas.length > 0) {
+        proximaEtapa = etapaAtual.subrespostas[0];
+      } else {
+        // finalizou no próprio campo livre
+        const resumo = atendimento.historico
+          .map((d) => `• ${d.chave.replace(/_/g, " ")}: ${d.valor}`)
+          .join("\n");
+        await msg.reply(
+          `✅ Obrigado pelas informações!\n\n📋 *Resumo do atendimento:*\n${resumo}\n\nEm breve um consultor entrará em contato.`
+        );
+        atendimentosAuto.delete(numero);
+        return true;
+      }
+    } else {
+      // 2. tenta casar com uma subresposta explícita (opção)
+      const encontrada = subrespostas.find((r: any) => {
+        if (!r.gatilho || typeof r.gatilho !== "string") return false;
+        return r.gatilho.toLowerCase() === texto;
+      });
+
+      if (encontrada) {
+        atendimento.historico.push({
+          chave: etapaAtual.gatilho.replace(/\|auto$/, ""),
+          valor: textoRaw
+        });
+
+        if (!encontrada.subrespostas || encontrada.subrespostas.length === 0) {
+          // final
+          const resumo = atendimento.historico
+            .map((d) => `• ${d.chave.replace(/_/g, " ")}: ${d.valor}`)
+            .join("\n");
+          await msg.reply(
+            `✅ Obrigado pelas informações!\n\n📋 *Resumo do atendimento:*\n${resumo}\n\nEm breve um consultor entrará em contato.`
+          );
+          atendimentosAuto.delete(numero);
+          return true;
+        }
+        proximaEtapa = encontrada;
+      } else {
+        // 3. se não casou e o nó atual tem um filho campo livre, assume que o texto é resposta desse campo
+        const livre = subrespostas.find(
+          (r: any) =>
+            typeof r.gatilho === "string" &&
+            r.gatilho.startsWith("[") &&
+            r.gatilho.endsWith("]")
+        );
+        if (livre) {
+          const campo = livre.gatilho.replace(/\[|\]/g, "");
+          atendimento.historico.push({ chave: campo, valor: textoRaw });
+
+          if (livre.subrespostas && livre.subrespostas.length > 0) {
+            proximaEtapa = livre.subrespostas[0];
+          } else {
+            // finalizou no campo livre filho
+            const resumo = atendimento.historico
+              .map((d) => `• ${d.chave.replace(/_/g, " ")}: ${d.valor}`)
+              .join("\n");
+            await msg.reply(
+              `✅ Obrigado pelas informações!\n\n📋 *Resumo do atendimento:*\n${resumo}\n\nEm breve um consultor entrará em contato.`
+            );
+            atendimentosAuto.delete(numero);
+            return true;
+          }
+        }
+      }
+    }
+
+    if (!proximaEtapa) {
+      await msg.reply("❌ Opção inválida. Tente novamente.");
+      return true;
+    }
+
+    atendimento.etapaAtual = proximaEtapa;
+    await msg.reply(proximaEtapa.resposta);
+    return true;
+  }
+
+  return false; // não era auto fluxo
+}
+/* VERSÃO PARA SIMULAÇÃO DE IMÓVEIS */
+
+
 //✨ IA
 //🤖 Robo
 //🌐 WebSocket
@@ -72,13 +212,18 @@ app.get("/getQRCode", async (_, res) => {
           ignorarBotsPara.add(chat.id._serialized);
         });
 
-    wwebInstance!.on("message", (msg:any) => 
+    wwebInstance!.on("message", async (msg:any) => 
     {
       const numero = msg.from;
       const texto = msg.body.trim();
-      const contextoAtual = contextoUsuario.get(numero);
+      
 
-      // 🛑 Ignora mensagens de grupos
+      //Campo |auto para financiamento
+      if (await handleAutoFlow(msg)) {
+        return;
+      }
+
+      //Ignora mensagens de grupos
       if (numero.endsWith("@g.us")) {
         wsocketInstance?.send(JSON.stringify({message:`[🌐] > 🙈 Robo Ignorando Grupo com ${numero}!`}));
         console.log(`🙈 Robo Ignorando conversa com ${numero}!`);
@@ -90,6 +235,8 @@ app.get("/getQRCode", async (_, res) => {
         console.log(`🙈 Robo Ignorando conversa com ${numero}!`);
         return;
       }
+      
+      const contextoAtual = contextoUsuario.get(numero);
 
       //Gatilho Bot
       function responderGatilhoInicial(texto: string, msg: any) 
@@ -108,33 +255,50 @@ app.get("/getQRCode", async (_, res) => {
         return responderGatilhoInicial(texto, msg);
       }
       
-      //Verifica se tem contexto salvo
+       //Verifica se tem contexto salvo
       if (contextoAtual && Array.isArray(contextoAtual)) {
         const index = Number(texto) - 1;
 
         if (!isNaN(index) && contextoAtual[index]) {
           const sub = contextoAtual[index];
-          
+
           if (sub.subrespostas) {
-            /*if(sub.subrespostas.length > 0){
+            // se o item escolhido tem uma única subresposta e ela é do tipo auto, entra direto no fluxo auto
+            if (sub.subrespostas.length === 1 && typeof sub.subrespostas[0].gatilho === "string" && sub.subrespostas[0].gatilho.toLowerCase().includes("|auto")) {
+              const respostaRaiz = sub.subrespostas[0];
+              // inicia o fluxo automático como se o usuário tivesse digitado o gatilho
+              atendimentosAuto.set(numero, {
+                etapaAtual: respostaRaiz,
+                historico: []
+              });
+              msgReply(msg, respostaRaiz.resposta);
+              return;
+            }
+
+            if (sub.subrespostas.length > 0) {
               msgReply(msg, `${sub.resposta}`);
-            }*/
+            }
+
             contextoUsuario.set(numero, sub.subrespostas);
-            // Mostra menu com subrespostas
-            const menu = sub.subrespostas.map((opcao, idx) => `[ *${idx + 1}* ] - ${opcao.gatilho}`).join("\n");
-            //menu ou resposta, caso nao tenha opções para o nivel especifico
-            msgSend(numero, msgMenu(
-              sub.subrespostas.length > 0 
-                ? menu 
-                : sub.resposta, 
-              sub.subrespostas.length > 0 ? "ESCOLHA UMA OPÇÃO" : `VOLTE AO MENU`));
+            const menu = sub.subrespostas
+              .map((opcao, idx) => `[ *${idx + 1}* ] - ${opcao.gatilho}`)
+              .join("\n");
+            msgSend(
+              numero,
+              msgMenu(
+                sub.subrespostas.length > 0 ? menu : sub.resposta,
+                sub.subrespostas.length > 0 ? "ESCOLHA UMA OPÇÃO" : `VOLTE AO MENU`
+              )
+            );
           } else {
             contextoUsuario.delete(numero);
           }
           return;
         } else {
-          const menu = contextoAtual.map((item, idx) => `[ *${idx + 1}* ] - ${item.gatilho}`).join("\n");
-          msgSend(numero, msgMenu(menu, 'OPÇÕES DISPONÍVEIS', "❌ OPÇÃO INVÁLIDA", texto));
+          const menu = contextoAtual
+            .map((item, idx) => `[ *${idx + 1}* ] - ${item.gatilho}`)
+            .join("\n");
+          msgSend(numero, msgMenu(menu, "OPÇÕES DISPONÍVEIS", "❌ OPÇÃO INVÁLIDA", texto));
           return;
         }
       }
